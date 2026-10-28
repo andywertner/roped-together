@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1366, initial-scale=1">
+<title>Roped Together</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <div id="zoom-bar"></div>
+  <div id="credit-footer">Made from a plan by Vinny, grade 7.</div>
+
+  <!-- ================= JOIN SCREEN ================= -->
+  <section id="screen-join" class="screen">
+    <div class="title">ROPED TOGETHER</div>
+
+    <div id="join-intro">
+      <canvas id="join-flag-canvas" width="16" height="16"></canvas>
+      <div class="speech-bubble">
+        We're tied by a rope! Only one of us moves at a time.
+        Take turns stepping to the flag together. Up climbs a block
+        or hops a gap. Don't pull the rope too tight!
+      </div>
+    </div>
+
+    <div class="pickers">
+      <div class="picker">
+        <h3>Player A</h3>
+        <div class="swatch-row" id="colors-a"></div>
+        <div class="picker-name" id="picker-name-a">Pick a color</div>
+      </div>
+      <div class="picker">
+        <h3>Player B</h3>
+        <div class="swatch-row" id="colors-b"></div>
+        <div class="picker-name" id="picker-name-b">Pick a color</div>
+      </div>
+    </div>
+
+    <div id="resume-note"></div>
+    <div id="join-actions">
+      <button id="btn-start" class="big-btn" disabled>Start Game</button>
+      <button id="btn-continue" class="ghost-btn hidden">Continue</button>
+    </div>
+    <button id="maker-unlock-link" class="ghost-btn hidden">Open the Level Maker</button>
+  </section>
+
+  <!-- ================= PLAY SCREEN ================= -->
+  <section id="screen-play" class="screen hidden">
+    <div id="play-header">
+      <div>
+        <div class="title">ROPED TOGETHER</div>
+        <div id="level-name">Level 1</div>
+      </div>
+      <div id="turn-indicator">
+        <span id="turn-arrow">&#9664;</span>
+        <span id="turn-dot"></span>
+        <span id="turn-label">Pink's turn</span>
+      </div>
+      <button id="btn-restart-play" class="small-btn">Start Over</button>
+    </div>
+
+    <div id="canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+      <div id="toast"></div>
+      <div id="win-overlay" class="hidden">
+        <div id="win-title">You did it!</div>
+        <div id="win-sub"></div>
+        <div id="win-actions"></div>
+      </div>
+    </div>
+
+    <div id="controls-row">
+      <div class="cluster" id="cluster-a">
+        <div class="cluster-label" id="cluster-label-a">Pink</div>
+        <div class="cluster-buttons">
+          <button class="step-btn up">UP</button>
+          <div class="cluster-lr">
+            <button class="step-btn left">LEFT</button>
+            <button class="step-btn right">RIGHT</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="center-info">
+        <div id="rope-note">Rope: 5 tiles max</div>
+      </div>
+
+      <div class="cluster" id="cluster-b">
+        <div class="cluster-label" id="cluster-label-b">Blue</div>
+        <div class="cluster-buttons">
+          <button class="step-btn up">UP</button>
+          <div class="cluster-lr">
+            <button class="step-btn left">LEFT</button>
+            <button class="step-btn right">RIGHT</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= LEVEL MAKER SCREEN ================= -->
+  <section id="screen-maker" class="screen hidden">
+    <div id="maker-header">
+      <div class="title">LEVEL MAKER</div>
+      <button id="btn-restart-maker" class="small-btn">Start Over</button>
+    </div>
+    <div id="maker-body">
+      <div id="maker-grid-wrap"></div>
+      <div id="maker-toolbar">
+        <button id="mode-block" class="mode-btn active">Place Blocks</button>
+        <button id="mode-startA" class="mode-btn">Set A Start</button>
+        <button id="mode-startB" class="mode-btn">Set B Start</button>
+        <button id="mode-flag" class="mode-btn">Set Flag</button>
+        <button id="btn-maker-minus" class="small-btn">- Tile</button>
+        <button id="btn-maker-plus" class="small-btn">+ Tile</button>
+        <label for="maker-rope">Rope length: <span id="maker-rope-val">4</span></label>
+        <input type="range" id="maker-rope" min="2" max="8" value="4">
+      </div>
+      <div id="maker-footer">
+        <div id="maker-status"></div>
+        <button id="btn-maker-back" class="ghost-btn">Back</button>
+        <button id="btn-maker-save" class="big-btn">Save &amp; Play</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="game.js"></script>
+</body>
+</html>
