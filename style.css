@@ -111,7 +111,7 @@ button {
 #screen-join {
   align-items: center;
   justify-content: flex-start;
-  padding: 10px 24px 46px 24px;
+  padding: 10px 24px 52px 24px;
   text-align: center;
 }
 
@@ -275,7 +275,7 @@ button {
 /* ---------- PLAY SCREEN ---------- */
 
 #screen-play {
-  padding: 8px 14px 46px 14px;
+  padding: 8px 14px 52px 14px;
 }
 
 #play-header {
@@ -433,6 +433,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding-right: 108px;
 }
 
 .cluster {
@@ -526,7 +527,7 @@ button {
 /* ---------- MAKER SCREEN ---------- */
 
 #screen-maker {
-  padding: 8px 14px 46px 14px;
+  padding: 8px 14px 52px 14px;
 }
 
 #maker-header {
@@ -635,6 +636,7 @@ button {
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
+  padding-right: 108px;
 }
 
 #maker-status {
@@ -648,10 +650,12 @@ button {
 #feedback-open {
   position: absolute;
   right: 8px;
-  bottom: 6px;
-  z-index: 70;
-  background: #3a2d63;
-  color: #f5f1ff;
+  bottom: 8px;
+  left: auto;
+  top: auto;
+  z-index: 100;
+  background: #ffcf4d;
+  color: #241a3d;
   font-size: 14px;
   font-weight: bold;
   padding: 8px 14px;
@@ -662,8 +666,10 @@ button {
 #feedback-panel {
   position: absolute;
   right: 8px;
-  bottom: 48px;
-  z-index: 70;
+  bottom: 52px;
+  left: auto;
+  top: auto;
+  z-index: 100;
   width: 280px;
   background: #241a3d;
   border: 2px solid #ffcf4d;
