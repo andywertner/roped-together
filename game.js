@@ -1140,6 +1140,8 @@
 
     document.addEventListener('keydown', function (ev) {
       if (state.screen !== 'play') return;
+      var tag = ev.target && ev.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       var active = state.turn;
       if (ev.key === 'ArrowLeft') { pressButton(active, 'left'); ev.preventDefault(); }
       else if (ev.key === 'ArrowRight') { pressButton(active, 'right'); ev.preventDefault(); }
@@ -1159,6 +1161,46 @@
     });
     el.btnMakerSave.addEventListener('click', makerSaveAndPlay);
     el.btnMakerBack.addEventListener('click', function () { showScreen('join'); });
+    wireFeedback();
+  }
+
+  function wireFeedback() {
+    var openBtn = document.getElementById('feedback-open');
+    var panel = document.getElementById('feedback-panel');
+    var closeBtn = document.getElementById('feedback-close');
+    var note = document.getElementById('feedback-note');
+    var submitBtn = document.getElementById('feedback-submit');
+    var sent = false;
+
+    openBtn.addEventListener('click', function () {
+      panel.className = '';
+    });
+
+    closeBtn.addEventListener('click', function () {
+      panel.className = 'hidden';
+    });
+
+    panel.addEventListener('submit', function (ev) {
+      if (sent) {
+        ev.preventDefault();
+        return;
+      }
+      var name = panel.elements.name.value.replace(/^\s+|\s+$/g, '');
+      var grade = panel.elements.grade.value;
+      var feedback = panel.elements.feedback.value.replace(/^\s+|\s+$/g, '');
+      if (!name || !grade || !feedback) {
+        ev.preventDefault();
+        note.textContent = 'Fill in name, grade, and feedback.';
+        return;
+      }
+      panel.elements.name.value = name;
+      panel.elements.feedback.value = feedback;
+      sent = true;
+      note.textContent = 'Thanks, that was sent.';
+      window.setTimeout(function () {
+        submitBtn.disabled = true;
+      }, 0);
+    });
   }
 
   function bindCluster(clusterEl, playerKey) {

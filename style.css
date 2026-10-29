@@ -111,7 +111,7 @@ button {
 #screen-join {
   align-items: center;
   justify-content: flex-start;
-  padding: 10px 24px 8px 24px;
+  padding: 10px 24px 46px 24px;
   text-align: center;
 }
 
@@ -275,7 +275,7 @@ button {
 /* ---------- PLAY SCREEN ---------- */
 
 #screen-play {
-  padding: 8px 14px 10px 14px;
+  padding: 8px 14px 46px 14px;
 }
 
 #play-header {
@@ -526,7 +526,7 @@ button {
 /* ---------- MAKER SCREEN ---------- */
 
 #screen-maker {
-  padding: 8px 14px 10px 14px;
+  padding: 8px 14px 46px 14px;
 }
 
 #maker-header {
@@ -641,4 +641,108 @@ button {
   font-size: 12px;
   color: #c9bfe8;
   margin-right: auto;
+}
+
+/* ---------- Feedback ---------- */
+
+#feedback-open {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  z-index: 70;
+  background: #3a2d63;
+  color: #f5f1ff;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 14px;
+  border-radius: 8px;
+  min-height: 36px;
+}
+
+#feedback-panel {
+  position: absolute;
+  right: 8px;
+  bottom: 48px;
+  z-index: 70;
+  width: 280px;
+  background: #241a3d;
+  border: 2px solid #ffcf4d;
+  border-radius: 10px;
+  padding: 8px 10px 10px 10px;
+  text-align: left;
+}
+
+#feedback-panel label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin: 6px 0 2px 0;
+}
+
+#feedback-panel input,
+#feedback-panel select,
+#feedback-panel textarea {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 2px solid #6a5ca8;
+  background: #fff6e0;
+  color: #241a3d;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+#feedback-panel textarea {
+  height: 46px;
+  resize: none;
+}
+
+#feedback-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+#feedback-submit {
+  background: #ffcf4d;
+  color: #241a3d;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 14px;
+  border-radius: 8px;
+  min-height: 36px;
+}
+
+#feedback-submit:disabled {
+  background: #5b5470;
+  color: #9a93b5;
+  cursor: default;
+}
+
+#feedback-close {
+  background: transparent;
+  color: #f5f1ff;
+  border: 2px solid #6a5ca8;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 14px;
+  border-radius: 8px;
+  min-height: 36px;
+}
+
+#feedback-note {
+  min-height: 18px;
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  font-weight: bold;
+  color: #ffcf4d;
+}
+
+#feedback-frame {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 0;
 }

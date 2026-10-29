@@ -129,6 +129,33 @@
     </div>
   </section>
 
+  <button type="button" id="feedback-open">Feedback</button>
+  <form id="feedback-panel" class="hidden" action="https://script.google.com/macros/s/AKfycbzQSZ0sy15Q08nF2OXAw9d5Chn1ppKoobJqw5vOj5w-lRr4JxsxtUxXxRc9m7TIU6Cm/exec" method="post" target="feedback-frame" autocomplete="off">
+    <input type="hidden" name="app" value="Roped Together">
+    <label for="feedback-name">Name</label>
+    <input id="feedback-name" name="name" type="text" maxlength="80">
+    <label for="feedback-grade">Your grade</label>
+    <select id="feedback-grade" name="grade">
+      <option value=""></option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+    </select>
+    <label for="feedback-text">Feedback</label>
+    <textarea id="feedback-text" name="feedback" rows="2" maxlength="400"></textarea>
+    <p id="feedback-note"></p>
+    <div id="feedback-actions">
+      <button type="submit" id="feedback-submit">Submit</button>
+      <button type="button" id="feedback-close">Close</button>
+    </div>
+  </form>
+  <iframe name="feedback-frame" id="feedback-frame" hidden></iframe>
+
 </div>
 <script src="game.js"></script>
 </body>
