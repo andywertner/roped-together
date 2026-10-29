@@ -19,9 +19,9 @@
     <div id="join-intro">
       <canvas id="join-flag-canvas" width="16" height="16"></canvas>
       <div class="speech-bubble">
-        We're tied by a rope! Only one of us moves at a time.
-        Take turns stepping to the flag together. Up climbs a block
-        or hops a gap. Don't pull the rope too tight!
+        Two players, one screen. Take turns walking to the flag.
+        Left and Right step. Up climbs a block or hops a gap.
+        The glowing buttons are the player who moves now.
       </div>
     </div>
 
@@ -54,9 +54,11 @@
         <div id="level-name">Level 1</div>
       </div>
       <div id="turn-indicator">
-        <span id="turn-arrow">&#9664;</span>
         <span id="turn-dot"></span>
-        <span id="turn-label">Pink's turn</span>
+        <span id="turn-text">
+          <span id="turn-label">Pink's turn</span>
+          <span id="coach">Press RIGHT to step toward the flag.</span>
+        </span>
       </div>
       <button id="btn-restart-play" class="small-btn">Start Over</button>
     </div>
@@ -84,6 +86,7 @@
       </div>
 
       <div id="center-info">
+        <div id="goal-note">Both of you must stand on the flag.</div>
         <div id="rope-note">Rope: 5 tiles max</div>
       </div>
 

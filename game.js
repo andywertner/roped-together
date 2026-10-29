@@ -272,8 +272,8 @@
 
     el.levelName = document.getElementById('level-name');
     el.turnDot = document.getElementById('turn-dot');
-    el.turnArrow = document.getElementById('turn-arrow');
     el.turnLabel = document.getElementById('turn-label');
+    el.coach = document.getElementById('coach');
     el.ropeNote = document.getElementById('rope-note');
     el.btnRestartPlay = document.getElementById('btn-restart-play');
     el.canvas = document.getElementById('game-canvas');
@@ -496,9 +496,7 @@
     var labelB = document.getElementById('cluster-label-b');
     var hexA = colorHex(state.colorA || 'pink');
     var hexB = colorHex(state.colorB || 'blue');
-    labelA.textContent = colorName(state.colorA || 'pink');
     labelA.style.color = hexA;
-    labelB.textContent = colorName(state.colorB || 'blue');
     labelB.style.color = hexB;
     var btnsA = el.clusterA.querySelectorAll('.step-btn');
     for (var i = 0; i < btnsA.length; i++) btnsA[i].style.background = hexA;
@@ -528,9 +526,9 @@
       var dir = action === 'left' ? -1 : 1;
       var nx = x + dir;
       var th = currentHeight(level, nx);
-      if (th === null) return { ok: false }; // off the end, or a gap: Up is needed, or there is nothing there
-      if (th > h) return { ok: false }; // too high to just walk onto; Up is needed
-      if (Math.abs(nx - otherX) > level.rope) return { ok: false }; // the rope would break
+      if (th === null) return { ok: false, reason: 'edge' };
+      if (th > h) return { ok: false, reason: 'high' };
+      if (Math.abs(nx - otherX) > level.rope) return { ok: false, reason: 'rope' };
       return { ok: true, x: nx, facing: dir, tiles: 1 };
     }
 
@@ -539,19 +537,51 @@
       var oneAhead = level.terrain[x + f];
       if (oneAhead && oneAhead.type === 'block' && oneAhead.h === h + 1) {
         var nx1 = x + f;
-        if (Math.abs(nx1 - otherX) > level.rope) return { ok: false };
+        if (Math.abs(nx1 - otherX) > level.rope) return { ok: false, reason: 'rope' };
         return { ok: true, x: nx1, facing: f, tiles: 1 };
       }
       var twoAhead = level.terrain[x + 2 * f];
       if (oneAhead && oneAhead.type === 'gap' && twoAhead && twoAhead.type === 'block' && twoAhead.h <= h) {
         var nx2 = x + 2 * f;
-        if (Math.abs(nx2 - otherX) > level.rope) return { ok: false };
+        if (Math.abs(nx2 - otherX) > level.rope) return { ok: false, reason: 'rope' };
         return { ok: true, x: nx2, facing: f, tiles: 2 };
       }
-      return { ok: false };
+      return { ok: false, reason: 'up' };
     }
 
-    return { ok: false };
+    return { ok: false, reason: 'edge' };
+  }
+
+  function moveMessage(reason) {
+    if (reason === 'rope') return 'The rope is too short. Your partner needs to step closer.';
+    if (reason === 'high') return 'That block is too high to walk onto. Press Up to climb.';
+    if (reason === 'up') return 'Up climbs a taller block or hops a gap. Walk with Left or Right.';
+    return 'There is no ground that way.';
+  }
+
+  // What the player whose turn it is should press next.
+  function suggestedMove(playerKey) {
+    if (!state.level) return { action: null, line: 'Pick a button to step.' };
+    var x = playerKey === 'A' ? state.posA : state.posB;
+    var name = colorName((playerKey === 'A' ? state.colorA : state.colorB) || (playerKey === 'A' ? 'pink' : 'blue'));
+    if (x === state.level.flag) {
+      return { action: null, line: name + ' is on the flag. Wait for your partner.' };
+    }
+    var dir = state.level.flag > x ? 'right' : 'left';
+    var word = dir === 'right' ? 'RIGHT' : 'LEFT';
+    var walk = tryStep(state.level, playerKey, dir);
+    if (walk.ok) return { action: dir, line: name + ', press ' + word + ' to step toward the flag.' };
+    var up = tryStep(state.level, playerKey, 'up');
+    if (up.ok) {
+      var facing = playerKey === 'A' ? state.facingA : state.facingB;
+      var ahead = state.level.terrain[x + (facing || 1)];
+      if (ahead && ahead.type === 'gap') return { action: 'up', line: name + ', press UP to hop the gap.' };
+      return { action: 'up', line: name + ', press UP to climb.' };
+    }
+    if (walk.reason === 'rope' || up.reason === 'rope') {
+      return { action: null, line: 'The rope is tight. ' + name + ' should wait. The other player steps closer.' };
+    }
+    return { action: dir, line: name + ', press ' + word + '.' };
   }
 
   function pressButton(playerKey, action) {
@@ -565,6 +595,8 @@
     if (!res.ok) {
       sfxIllegal();
       shakeCharacter(playerKey);
+      showToast(moveMessage(res.reason));
+      kickRender();
       return;
     }
     var fromX = playerKey === 'A' ? state.posA : state.posB;
@@ -585,6 +617,7 @@
     state.turn = state.turn === 'A' ? 'B' : 'A';
     updateTurnUI();
     saveProgress();
+    kickRender();
 
     if (state.posA === state.level.flag && state.posB === state.level.flag) {
       state.won = true;
@@ -599,10 +632,10 @@
     sfxStone();
     showToast('Almost your turn, just wait!');
     pulseTurnArrow();
-    var cluster = playerKey === 'A' ? el.clusterA : el.clusterB;
-    cluster.className = 'cluster stone';
+    updateTurnUI();
+    kickRender();
     window.setTimeout(function () {
-      cluster.className = 'cluster';
+      updateTurnUI();
     }, STONE_MS);
   }
 
@@ -621,16 +654,47 @@
   }
 
   function pulseTurnArrow() {
-    el.turnArrow.className = 'pulse';
-    window.setTimeout(function () { el.turnArrow.className = ''; }, 1000);
+    el.turnDot.className = 'pulse';
+    window.setTimeout(function () { el.turnDot.className = ''; }, 1000);
+  }
+
+  function clusterClass(playerKey) {
+    var cls = 'cluster';
+    cls += state.turn === playerKey ? ' active' : ' waiting';
+    var now = performance.now();
+    var until = playerKey === 'A' ? state.stoneUntilA : state.stoneUntilB;
+    if (now < until) cls += ' stone';
+    return cls;
+  }
+
+  function clearButtonHints() {
+    var hinted = document.querySelectorAll('.step-btn.hint');
+    for (var i = 0; i < hinted.length; i++) {
+      hinted[i].className = hinted[i].className.replace(' hint', '');
+    }
   }
 
   function updateTurnUI() {
     var isA = state.turn === 'A';
+    var activeKey = isA ? 'A' : 'B';
     var hex = colorHex((isA ? state.colorA : state.colorB) || (isA ? 'pink' : 'blue'));
+    var name = colorName((isA ? state.colorA : state.colorB) || (isA ? 'pink' : 'blue'));
     el.turnDot.style.background = hex;
-    el.turnLabel.textContent = colorName((isA ? state.colorA : state.colorB) || (isA ? 'pink' : 'blue')) + "'s turn";
-    el.turnArrow.textContent = isA ? '\u25C0' : '\u25B6'; // left/right pointing triangle as a simple "whose turn" symbol
+    el.turnLabel.textContent = name + "'s turn";
+    var hint = suggestedMove(activeKey);
+    el.coach.textContent = hint.line;
+    el.clusterA.className = clusterClass('A');
+    el.clusterB.className = clusterClass('B');
+    var labelA = document.getElementById('cluster-label-a');
+    var labelB = document.getElementById('cluster-label-b');
+    labelA.textContent = colorName(state.colorA || 'pink') + (isA ? ' · YOUR TURN' : ' · wait');
+    labelB.textContent = colorName(state.colorB || 'blue') + (!isA ? ' · YOUR TURN' : ' · wait');
+    clearButtonHints();
+    if (hint.action) {
+      var cluster = isA ? el.clusterA : el.clusterB;
+      var btn = cluster.querySelector('.step-btn.' + hint.action);
+      if (btn) btn.className = btn.className + ' hint';
+    }
   }
 
   function hideWinOverlay() {
@@ -679,6 +743,17 @@
   /* ======================= CANVAS RENDERING (play) ======================= */
 
   var ctx = null;
+  var renderScheduled = false;
+
+  function kickRender() {
+    if (renderScheduled) return;
+    renderScheduled = true;
+    window.requestAnimationFrame(function () {
+      renderScheduled = false;
+      renderGame();
+    });
+  }
+
   function resizeCanvas() {
     if (!el.canvas || state.screen !== 'play') return;
     var rect = el.canvasWrap.getBoundingClientRect();
@@ -691,6 +766,7 @@
   }
 
   function renderGame() {
+    if (state.screen !== 'play') return;
     if (!ctx || !state.level) return;
     var level = state.level;
     var W = el.canvas.width, H = el.canvas.height;
@@ -750,38 +826,44 @@
     // characters (with simple animation interpolation)
     var posAx = state.posA, posBx = state.posB;
     var shakeA = 0, shakeB = 0;
+    var hopA = 0, hopB = 0;
     var now = performance.now();
+    var stoneA = now < state.stoneUntilA;
+    var stoneB = now < state.stoneUntilB;
     anims = anims.filter(function (a) { return now - a.start < a.duration; });
     anims.forEach(function (a) {
       var p = Math.min(1, (now - a.start) / a.duration);
       var ease = 1 - Math.pow(1 - p, 2);
       if (a.shake) {
-        var wobble = Math.sin(p * Math.PI * 6) * (1 - p) * 4;
+        var wobble = Math.sin(p * Math.PI * 6) * (1 - p) * 6;
         if (a.player === 'A') shakeA = wobble; else shakeB = wobble;
       } else if (a.player === 'A') {
         posAx = a.fromX + (a.toX - a.fromX) * ease;
+        hopA = Math.sin(p * Math.PI) * 26;
       } else {
         posBx = a.fromX + (a.toX - a.fromX) * ease;
+        hopB = Math.sin(p * Math.PI) * 26;
       }
     });
+
+    if (!stoneA && state.turn === 'A' && hopA === 0) hopA = Math.sin(now / 160) * 5;
+    if (!stoneB && state.turn === 'B' && hopB === 0) hopB = Math.sin(now / 160) * 5;
 
     var hA = heightAtInterpolated(level, posAx);
     var hB = heightAtInterpolated(level, posBx);
     var ax = xOf(posAx) + tileSize / 2 + shakeA;
-    var ay = yOf(hA);
+    var ay = yOf(hA) - hopA;
     var bx = xOf(posBx) + tileSize / 2 + shakeB;
-    var by = yOf(hB);
+    var by = yOf(hB) - hopB;
 
     drawRope(ax, ay, bx, by, Math.abs(Math.round(posAx) - Math.round(posBx)), level.rope);
 
-    var stoneA = now < state.stoneUntilA;
-    var stoneB = now < state.stoneUntilB;
-    drawCharacter(ax, ay, tileSize, colorHex(state.colorA || 'pink'), stoneA, state.facingA, state.turn === 'A');
-    drawCharacter(bx, by, tileSize, colorHex(state.colorB || 'blue'), stoneB, state.facingB, state.turn === 'B');
+    var nameA = colorName(state.colorA || 'pink');
+    var nameB = colorName(state.colorB || 'blue');
+    drawCharacter(ax, ay, tileSize, colorHex(state.colorA || 'pink'), stoneA, state.facingA, state.turn === 'A', nameA);
+    drawCharacter(bx, by, tileSize, colorHex(state.colorB || 'blue'), stoneB, state.facingB, state.turn === 'B', nameB);
 
-    if (anims.length > 0 || stoneA || stoneB) {
-      window.requestAnimationFrame(renderGame);
-    }
+    kickRender();
   }
 
   function heightAtInterpolated(level, xFloat) {
@@ -824,7 +906,7 @@
     ctx.setLineDash([]);
   }
 
-  function drawCharacter(x, y, tileSize, hex, isStone, facing, isActive) {
+  function drawCharacter(x, y, tileSize, hex, isStone, facing, isActive, name) {
     var w = Math.round(tileSize * 0.62);
     var h = Math.round(tileSize * 0.9);
     var top = y - h;
@@ -858,16 +940,21 @@
       ctx.stroke();
     }
 
-    // active-turn marker above head
+    ctx.font = 'bold 14px Arial, Helvetica, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
     if (isActive && !isStone) {
       ctx.fillStyle = '#ffcf4d';
+      ctx.fillText('GO', x, top - 16);
       ctx.beginPath();
-      ctx.moveTo(x - 5, top - 10);
-      ctx.lineTo(x + 5, top - 10);
-      ctx.lineTo(x, top - 2);
+      ctx.moveTo(x - 6, top - 12);
+      ctx.lineTo(x + 6, top - 12);
+      ctx.lineTo(x, top - 3);
       ctx.closePath();
       ctx.fill();
     }
+    ctx.fillStyle = '#fff6e0';
+    ctx.fillText(name || '', x, isActive && !isStone ? top - 30 : top - 4);
 
     // feet shadow
     ctx.fillStyle = 'rgba(0,0,0,0.3)';

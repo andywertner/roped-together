@@ -24,8 +24,9 @@ three buttons: **Left**, **Right**, and **Up**.
      character turns to stone for about a second, you'll hear a
      buzz, and a message says "Almost your turn, just wait!" The
      turn does not change.
-   - The arrow in the turn indicator always shows whose turn it
-     really is.
+   - The color dot, the glowing buttons, and the bouncing character
+     show whose turn it is. The line under the name tells you which
+     button to press.
    - When **both** players reach the flag, you both get a
      congratulations and the next, harder level loads. Harder levels
      have a shorter rope, more gaps, and a faster step animation.

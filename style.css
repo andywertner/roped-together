@@ -279,7 +279,7 @@ button {
 }
 
 #play-header {
-  flex: 0 0 48px;
+  flex: 0 0 62px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -309,18 +309,26 @@ button {
 }
 
 #turn-dot {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 4px;
   border: 2px solid rgba(0, 0, 0, 0.3);
+  flex: 0 0 auto;
 }
 
-#turn-arrow {
-  font-size: 16px;
-  display: inline-block;
+#turn-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
 }
 
-#turn-arrow.pulse {
+#coach {
+  font-size: 13px;
+  font-weight: bold;
+  color: #ffcf4d;
+}
+
+#turn-dot.pulse {
   -webkit-animation: pulseArrow 0.5s ease-in-out 2;
   animation: pulseArrow 0.5s ease-in-out 2;
 }
@@ -367,15 +375,15 @@ button {
   position: absolute;
   top: 10px;
   left: 50%;
-  margin-left: -170px;
-  width: 340px;
+  margin-left: -230px;
+  width: 460px;
   text-align: center;
-  background: rgba(20, 15, 36, 0.92);
+  background: rgba(20, 15, 36, 0.94);
   color: #fff;
   border: 2px solid #ffcf4d;
   border-radius: 10px;
-  padding: 8px 10px;
-  font-size: 14px;
+  padding: 10px 12px;
+  font-size: 16px;
   font-weight: bold;
   pointer-events: none;
   opacity: 0;
@@ -474,8 +482,24 @@ button {
   width: 148px;
 }
 
+.cluster.waiting {
+  opacity: 0.55;
+}
+
+.cluster.active {
+  background: rgba(255, 207, 77, 0.16);
+  box-shadow: inset 0 0 0 3px #ffcf4d;
+}
+
 .cluster.stone .step-btn {
   opacity: 0.55;
+}
+
+.step-btn.hint {
+  outline: 3px solid #fff6e0;
+  outline-offset: 2px;
+  -webkit-animation: pulseArrow 0.7s ease-in-out infinite;
+  animation: pulseArrow 0.7s ease-in-out infinite;
 }
 
 #center-info {
@@ -487,9 +511,16 @@ button {
   gap: 4px;
 }
 
+#goal-note {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+}
+
 #rope-note {
   font-size: 12px;
   color: #c9bfe8;
+  text-align: center;
 }
 
 /* ---------- MAKER SCREEN ---------- */
